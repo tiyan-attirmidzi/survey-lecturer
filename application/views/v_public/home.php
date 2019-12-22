@@ -24,7 +24,7 @@
                                 </div>
                                 <div class="box-body">
                                     <p>
-                                        skajsjkajskjaksjkaJSKJSKDJAKJDKASJDKJASKDJASKDJKASJDKAJSKDJASK
+                                        <!-- skajsjkajskjaksjkaJSKJSKDJAKJDKASJDKJASKDJASKDJKASJDKAJSKDJASK -->
                                     </p>
                                 </div>
                                 <div class="box-body">
@@ -78,7 +78,7 @@
 
                                 </div>
                                 <!-- /.box-body -->
-                                <?php 
+                                <?php
                                     echo "<script> var alternative = ".json_encode($alternative)."</script>";
                                     echo "<script> var criteria = ".json_encode($criteria)."</script>";
                                 ?>
@@ -138,25 +138,38 @@
             });
             // console.log(v);
             // console.log(alternative);
-            
-            var header_display  = document.getElementById('nama_dosen');
 
-            header_display.innerHTML = '';
-            alternative.forEach(data => {
-                if(v.includes(data['id'])){
-                    console.log(data);
-                    header_display.innerHTML += '<div class="box-header with-border"><h3 class="box-title"><b>'+data['name']+'</b></h3></div>';
-                }
+            var content  = document.getElementById('nama_dosen');
+            var content_display = '';
+
+            $.each(alternative, function(i, alt){
+              if(v.includes(alt['id'])){
+                content_display += '<div class="box-header with-border"><h3 class="box-title"><b>';
+                content_display += alt['name'];
+                content_display += '</b></h3></div>';
+
+                content_display += '<div class="box-body"><div id="biodata"><div class="form-group">';
+
+                $.each(criteria, function(j, crit){
+                  content_display += '<label for="nim">'+crit['name']+'</label><span class="text-danger"> *</span><br>';
+                  content_display += '<div class="form-group">';
+
+                  for (var index = 1; index <= 5; index++) {
+                    content_display += '<input type="radio" name="Value-'+crit['id']+''+alt['id']+'" class="minimal" required>'+index;
+                    content_display += '<label style="margin-right: 50px">';
+                    content_display += '</label>';
+                  }
+
+                  content_display += '</div>';
+
+                });
+
+                content_display += '</div></div></div>';
+
+              }
             });
-            
-            // ques_display.innerHTML = '';
-            // criteria.forEach(data => {
-            //     if(v.includes(data['id'])){
-            //         console.log(data);
-            //         ques_display.innerHTML += '<div class="box-header with-border"><h3 class="box-title"><b>'+data['name']+'</b></h3></div>';
-            //     }
-            // });
 
+            content.innerHTML = content_display;
         });
 
     });
