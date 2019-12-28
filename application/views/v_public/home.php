@@ -67,7 +67,7 @@
                                         <div class="form-group">
                                             <label>Angkatan</label>
                                             <span class="text-danger"> *</span>
-                                            <select class="form-control" name="since">
+                                            <select class="form-control" name="since" id="angkatan">
                                                 <option>Angkatan 2016</option>
                                                 <option>Angkatan 2017</option>
                                                 <option>Angkatan 2018</option>
@@ -110,7 +110,9 @@
                                 <div class="box-footer">
                                     <!-- <bu3 class="box-title"><b><?php echo $keyForAlt->name; ?></b></h3>
                                     </div>tton type="submit" class="btn btn-primary" >Selanjutnya</button> -->
-                                    <button type="button" class="btn btn-primary" id="proses">Selanjutnya</button>
+                                    <button type="button" class="btn btn-secondary" id="proses">Selanjutnya</button>
+                                    <button type="button" class="btn btn-danger" id="cancel_btn">Batal</button>
+                                    <button type="button" class="btn btn-primary" id="submit_btn">Proses</button>
                                 </div>
 
                             <?php echo form_close(); ?>
@@ -131,7 +133,11 @@
 
 <script>
     $(document).ready(function() {
+      $('#submit_btn, #cancel_btn').hide();
+
         $('#proses').click(function(){
+            $('#proses').hide();
+            $('#submit_btn, #cancel_btn').show();
             var v = [];
             $('.lectures_group:checked').each(function(i){
                 v[i] = $(this).val();
@@ -142,6 +148,7 @@
             var content  = document.getElementById('nama_dosen');
             var content_display = '';
 
+            content_display += '<div id="content_dosen">'
             $.each(alternative, function(i, alt){
               if(v.includes(alt['id'])){
                 content_display += '<div class="box-header with-border"><h3 class="box-title"><b>';
@@ -155,7 +162,11 @@
                   content_display += '<div class="form-group">';
 
                   for (var index = 1; index <= 5; index++) {
-                    content_display += '<input type="radio" name="Value-'+crit['id']+''+alt['id']+'" class="minimal" required>'+index;
+                    if(index == 1){
+                      content_display += '<input type="radio" name="Value-'+alt['id']+''+crit['id']+'" value="'+index+'" class="minimal" checked required>'+index;
+                    }else {
+                      content_display += '<input type="radio" name="Value-'+alt['id']+''+crit['id']+'" value="'+index+'" class="minimal" required>'+index;
+                    }
                     content_display += '<label style="margin-right: 50px">';
                     content_display += '</label>';
                   }
@@ -168,8 +179,57 @@
 
               }
             });
+            content_display += '</div>';
 
             content.innerHTML = content_display;
+        });
+
+        $('#cancel_btn').click(function(){
+          $('#submit_btn, #cancel_btn').hide();
+          $('#proses').show();
+
+          var element = document.getElementById("content_dosen");
+          element.parentNode.removeChild(element);
+        });
+
+        $('#submit_btn').click(function(){
+          var content = {};
+          content['biodata'] = {};
+          content['biodata']['nim'] = $('#nim').val()
+          content['biodata']['name'] = $('#name').val()
+          content['biodata']['angkatan'] = $('#angkatan').val()
+          content['dosen'] = {};
+
+          var v = [];
+          $('.lectures_group:checked').each(function(i){
+            v[i] = $(this).val();
+            content['dosen']['dosen'+(v[i])] = {};
+          });
+
+          $.each(alternative, async function(i, alt){
+            if(v.includes(alt['id'])){
+              data = {}
+              $.each(criteria, async function(j, crit){
+                data[''+alt['id']+'-'+crit['id']] = $('input[name=Value-'+alt['id']+''+crit['id']+']:checked').val();;
+              });
+              content['dosen']['dosen'+alt['id']] = data;
+            }
+          });
+          console.log(content);
+          var json_data = JSON.stringify(content);
+          console.log(json_data);
+          $.ajax({
+            type: "POST",
+            url: "post_data",
+            data: {data : json_data},
+            cache: false,
+
+            success: function(data){
+              console.log(data);
+                // alert("OK");
+            }
+          });
+
         });
 
     });

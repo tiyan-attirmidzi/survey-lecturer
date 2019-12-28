@@ -29,7 +29,7 @@ class Home extends CI_Controller {
 		$this->load->view('v_public/home', $data);
 		$this->load->view('templates/part_public/footer', $data);
     }
-    
+
     public function get_lecturer()
 	{
         $lecturer                           = $this->input->post('id');
@@ -38,12 +38,26 @@ class Home extends CI_Controller {
     }
 
     public function next()
-	{
-		$data['alternative']				= $this->model_alternative->get();
-		$data['criteria']				    = $this->model_criteria->get();
+  	{
+    		$data['alternative']				= $this->model_alternative->get();
+    		$data['criteria']				    = $this->model_criteria->get();
 
-		$this->load->view('templates/part_public/footer', $data);
+    		$this->load->view('templates/part_public/footer', $data);
+        }
+
+      public function post_data()
+      {
+        $data = json_decode(stripslashes($_GET['data']));
+
+        print_r($data->dosen);
+
+        // foreach($data as $d){
+        //    echo $d;
+        // }
+      }
+
+
     }
-}
+
 
 ?>
